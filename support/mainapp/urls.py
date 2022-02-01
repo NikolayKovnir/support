@@ -13,8 +13,7 @@ urlpatterns = [
     path('users/<int:pk>/', views.UserDetail.as_view()),
     path('tickets/', views.Ticketlist.as_view()),
     path('tickets/<int:pk>', views.TicketDetail.as_view()),
-    path('answer/<int:pk>', views.AnswerDetail.as_view()),
-    path('answer/', views.AnswerCreate.as_view()),
+
 ]
 
 

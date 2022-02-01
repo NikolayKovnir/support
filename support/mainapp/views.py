@@ -1,16 +1,14 @@
-from .permissions import IsOwnerOrReadOnly
 from . import serializers
-from .models import Answer, Ticket
-from rest_framework import generics, permissions
-from django.contrib.auth.models import User
+from .models import User, Ticket
+from rest_framework import generics
 
 
 """apiview использую для представления моделей User 
 и работы с запросами для User, конкретно для класса ниже
 createApiView чтобы создать пользователя через api"""
-class UserCreate(generics.CreateAPIView):
+class UserCreate(generics.ListCreateAPIView):
     queryset = User.objects.all()
-    serializer_class = serializers.UserSerializer
+    serializer_class = serializers.UserCreateSerializer
 
 
 """listApiView чтобы получить список пользователей через api"""
@@ -24,8 +22,7 @@ class UserList(generics.ListAPIView):
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly,
-                            IsOwnerOrReadOnly]
+    
 
 
 """"педставление тикетЛист наследуется от класса CreateApiView
@@ -35,7 +32,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
 class Ticketlist(generics.ListCreateAPIView):
     qureyset = Ticket.objects.all()
     serializer_class = serializers.TicketSerilizer
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -47,16 +44,3 @@ class Ticketlist(generics.ListCreateAPIView):
 class TicketDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Ticket.objects.all()
     serializer_class = serializers.TicketSerilizer
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly,
-                            IsOwnerOrReadOnly]
-
-class AnswerCreate(generics.CreateAPIView):
-    quryset = Answer.objects.all()
-    serializer_class = serializers.AnswerSerializer
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
-
-class AnswerDetail(generics.RetrieveDestroyAPIView):
-    queryset = Answer.objects.all()
-    serializer_class = serializers.AnswerSerializer
-    permissions_classes = [permissions.IsAuthenticatedOrReadOnly,
-                            IsOwnerOrReadOnly]
