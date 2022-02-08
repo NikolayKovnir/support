@@ -7,10 +7,10 @@ from . import views
 
 
 urlpatterns = [
-    path('api-auth/', include('rest_framework.urls')),
-    path('register/', views.UserCreate.as_view(),name='auth_register'),
-    path('users/', views.UserList.as_view()),
-    path('users/<int:pk>/', views.UserDetail.as_view()),
-
+    path('login/', include('rest_framework.urls')),
+    path('register/', views.UserCreate.as_view()),
+    path('userlist/', views.UserList.as_view()),
+    path('ticketlist/', views.TicketListView.as_view()),
+    path('tickets/<int:pk>/', views.TicketUpdate.as_view()),
 ]
 

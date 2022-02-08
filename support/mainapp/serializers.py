@@ -1,16 +1,12 @@
 
 from rest_framework import serializers
-from django.contrib.auth.models import User
-from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
+from .models import Ticket, Answer
+from django.contrib.auth.models import User
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(
-            required=True,
-            validators=[UniqueValidator(queryset=User.objects.all())]
-            )
-
+    
     password = serializers.CharField(write_only=True,
             required=True,
             validators=[validate_password]
@@ -21,7 +17,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2' , 'email',)
+        fields = ('username', 'password', 'password2' , 'is_staff')
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -35,8 +31,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create(
             username=validated_data['username'],
-            email=validated_data['email'],
         )
+        user.is_staff = True
         user.set_password(validated_data['password'])
         user.save()
 
@@ -44,15 +40,33 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 
+class TicketSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    answers = serializers.SlugRelatedField(
+        slug_field='comment', 
+        many=True, 
+        queryset=Answer.objects.all()
+        )
 
-"""UserSerializer 
-записан для работы с моделью User и обработки API запросов."""
+    class Meta:
+        model = Ticket
+        fields = ('id', 'title', 'owner','body', 'answers')
+
+
+
 class UserSerializer(serializers.ModelSerializer):
     tickets = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    
+    answers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
     class Meta:
         model = User
-        fields = ('id', 'username')
+        fields = ['id', 'username', 'tickets']
 
 
+class AnswerSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+    
 
+    class Meta:
+        model = Answer
+        fields = ['id', 'comment', 'owner', 'ticket']
