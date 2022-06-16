@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Answer, Ticket 
+from .models import Ticket
 
 
 admin.site.register(Ticket)
-admin.site.register(Answer)
+
+
